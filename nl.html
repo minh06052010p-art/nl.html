@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vũ Trụ Hành Tinh Tình Yêu 14/3</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background: #010103;
+            font-family: 'Arial', sans-serif; color: white;
+        }
+
+        #stars { position: fixed; width: 100%; height: 100%; z-index: 0; }
+        .star-bg {
+            position: absolute; background: white; border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+        }
+        @keyframes twinkle { from { opacity: 0.1; } to { opacity: 0.9; } }
+
+        /* Sao băng */
+        .shooting-star {
+            position: absolute; width: 100px; height: 1px;
+            background: linear-gradient(to right, white, transparent);
+            transform: rotate(-35deg); opacity: 0; pointer-events: none;
+            animation: shoot 1.5s linear;
+        }
+        @keyframes shoot {
+            0% { transform: rotate(-35deg) translateX(0); opacity: 1; }
+            100% { transform: rotate(-35deg) translateX(600px); opacity: 0; }
+        }
+
+        /* 1. Màn hình Loading 5 ngôi sao vàng */
+        #loading-screen {
+            position: fixed; width: 100%; height: 100%;
+            background: #000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 100;
+            transition: opacity 1s;
+        }
+        .loader-stars { display: flex; gap: 10px; margin-bottom: 20px; }
+        .star-gold {
+            font-size: 2.5rem; color: #FFD700; 
+            text-shadow: 0 0 20px #FFD700;
+            animation: pulse 0.8s infinite alternate;
+        }
+        @keyframes pulse { from { transform: scale(1); opacity: 0.5; } to { transform: scale(1.3); opacity: 1; } }
+
+        /* 2. Màn hình Valentine Trắng Lung Linh */
+        #welcome-screen {
+            position: absolute; top: 45%; left: 50%;
+            transform: translate(-50%, -50%); z-index: 20;
+            text-align: center; display: none; transition: 0.8s;
+        }
+        .title-val {
+            font-size: 4.5rem; font-weight: bold; margin: 0;
+            background: linear-gradient(to bottom, #fff 30%, #f7c7ff 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+            line-height: 1;
+        }
+        .title-trang {
+            font-size: 5rem; font-weight: bold; color: #ff4d6d;
+            text-shadow: 0 0 30px #ff4d6d; margin-top: -10px;
+        }
+        .date-box {
+            display: inline-block; border: 2px solid rgba(255, 255, 255, 0.5);
+            background: rgba(0,0,0,0.3);
+            padding: 10px 30px; border-radius: 5px; font-size: 2rem;
+            margin: 20px 0; box-shadow: 0 0 20px rgba(255, 77, 109, 0.5);
+            color: #00f2ff; font-weight: bold;
+        }
+        .btn-open {
+            display: block; margin: 10px auto;
+            padding: 12px 40px; font-size: 1.1rem; background: transparent;
+            color: white; border: 1.5px solid #4facfe; border-radius: 50px;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px #4facfe;
+        }
+        .btn-open:hover { background: #4facfe; box-shadow: 0 0 30px #4facfe; }
+
+        /* 3. Vũ trụ và Hành tinh xếp chéo */
+        #universe { display: none; width: 100%; height: 100%; position: relative; }
+        svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        line { stroke: rgba(255, 255, 255, 0.2); stroke-width: 1.5; stroke-dasharray: 5; }
+
+        .planet {
+            position: absolute; border-radius: 50%; cursor: pointer;
+            z-index: 5; transition: 0.5s;
+        }
+        .planet:hover { transform: scale(1.3); filter: brightness(1.2); }
+
+        /* 4. Modal nội dung */
+        #modal {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 20, 0.98);
+            padding: 25px; border-radius: 20px;
+            border: 1px solid #ff4d6d; z-index: 1000;
+            width: 380px; text-align: center; box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
+        .img-preview { width: 100%; border-radius: 12px; margin-bottom: 15px; display: none; }
+        textarea, input {
+            width: 90%; background: #000; border: 1px solid #333;
+            color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px;
+        }
+        .btn-save { background: #ff4d6d; border: none; padding: 10px 25px; color: white; border-radius: 5px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="stars"></div>
+
+    <div id="loading-screen">
+        <div class="loader-stars">
+            <span class="star-gold">★</span><span class="star-gold">★</span><span class="star-gold">★</span><span class="star-gold">★</span><span class="star-gold">★</span>
+        </div>
+        <p>Đang dệt nên vũ trụ hành tinh...</p>
+    </div>
+
+    <div id="welcome-screen">
+        <div class="title-val">VALENTINE</div>
+        <div class="title-trang">Trắng</div>
+        <div class="date-box">14</div>
+        <p style="margin-top:-15px; color:#00f2ff">Tháng 3</p>
+        <button class="btn-open" onclick="initUniverse()">Khám phá vũ trụ tình yêu</button>
+    </div>
+
+    <div id="universe">
+        <svg id="svg-lines"></svg>
+        <div id="planet-container"></div>
+    </div>
+
+    <div id="modal">
+        <h2 id="m-title" style="color:#ff4d6d; margin: 0 0 15px 0;">Hành tinh...</h2>
+        <img id="m-img" class="img-preview" src="">
+        <input type="text" id="m-img-url" placeholder="Dán link ảnh tại đây...">
+        <textarea id="m-text" rows="5" placeholder="Gửi tin nhắn đến hành tinh này..."></textarea>
+        <br>
+        <button class="btn-save" onclick="saveData()">Gửi tin nhắn</button>
+        <button class="btn-save" style="background:#333" onclick="closeModal()">Đóng</button>
+    </div>
+
+    <script>
+        // Tạo sao nền và Sao băng
+        const starWrap = document.getElementById('stars');
+        for(let i=0; i<200; i++) {
+            let s = document.createElement('div');
+            s.className = 'star-bg';
+            s.style.width = s.style.height = Math.random()*3+'px';
+            s.style.top = Math.random()*100+'%';
+            s.style.left = Math.random()*100+'%';
+            starWrap.appendChild(s);
+        }
+
+        setInterval(() => {
+            let ss = document.createElement('div');
+            ss.className = 'shooting-star';
+            ss.style.top = Math.random()*50+'%';
+            ss.style.left = Math.random()*100+'%';
+            starWrap.appendChild(ss);
+            setTimeout(() => ss.remove(), 1500);
+        }, 2000);
+
+        // Loading
+        setTimeout(() => {
+            document.getElementById('loading-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('welcome-screen').style.display = 'block';
+            }, 1000);
+        }, 3000);
+
+        const config = [
+            { id: 1, name: "Kỷ niệm", color: "radial-gradient(circle at 30% 30%, #ff9a9e, #ff4d6d)", top: 75, left: 15, glow: "#ff4d6d" },
+            { id: 2, name: "Lời hứa", color: "radial-gradient(circle at 30% 30%, #a1c4fd, #4facfe)", top: 60, left: 32, glow: "#4facfe" },
+            { id: 3, name: "Cảm xúc", color: "radial-gradient(circle at 30% 30%, #fcb69f, #ff8177)", top: 45, left: 49, glow: "#ff8177" },
+            { id: 4, name: "Tương lai", color: "radial-gradient(circle at 30% 30%, #d4fc79, #96e6a1)", top: 30, left: 66, glow: "#d4fc79" },
+            { id: 5, name: "Gắn kết", color: "radial-gradient(circle at 30% 30%, #cfd9df, #606c88)", top: 15, left: 83, glow: "#fff" }
+        ];
+
+        let currentActive = null;
+
+        function initUniverse() {
+            document.getElementById('welcome-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('welcome-screen').style.display = 'none';
+                document.getElementById('universe').style.display = 'block';
+                drawPlanets();
+            }, 800);
+        }
+
+        function drawPlanets() {
+            const container = document.getElementById('planet-container');
+            const svg = document.getElementById('svg-lines');
+            config.forEach((p, index) => {
+                let el = document.createElement('div');
+                el.className = 'planet';
+                el.style.width = el.style.height = '80px';
+                el.style.background = p.color;
+                el.style.boxShadow = `0 0 35px ${p.glow}`;
+                el.style.top = p.top + '%';
+                el.style.left = p.left + '%';
+                el.onclick = () => openModal(p);
+                container.appendChild(el);
+
+                if (index < config.length - 1) {
+                    let nextP = config[index + 1];
+                    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", (p.left + 3) + "%");
+                    line.setAttribute("y1", (p.top + 4) + "%");
+                    line.setAttribute("x2", (nextP.left + 3) + "%");
+                    line.setAttribute("y2", (nextP.top + 4) + "%");
+                    svg.appendChild(line);
+                }
+            });
+        }
+
+        function openModal(p) {
+            currentActive = p;
+            document.getElementById('modal').style.display = 'block';
+            document.getElementById('m-title').innerText = "Hành tinh " + p.name;
+            const data = JSON.parse(localStorage.getItem('p_final_'+p.id)) || { text: "", img: "" };
+            document.getElementById('m-text').value = data.text;
+            document.getElementById('m-img-url').value = data.img;
+            const imgTag = document.getElementById('m-img');
+            if(data.img) { imgTag.src = data.img; imgTag.style.display = 'block'; }
+            else { imgTag.style.display = 'none'; }
+        }
+
+        function saveData() {
+            const text = document.getElementById('m-text').value;
+            const img = document.getElementById('m-img-url').value;
+            localStorage.setItem('p_final_'+currentActive.id, JSON.stringify({ text, img }));
+            if(img) { document.getElementById('m-img').src = img; document.getElementById('m-img').style.display = 'block'; }
+            alert("Đã gửi lời nhắn vào hành tinh!");
+        }
+
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    </script>
+</body>
+</html>
